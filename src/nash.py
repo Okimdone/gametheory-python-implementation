@@ -1,10 +1,9 @@
 import numpy as np
 
-
 class Nash:
     def __init__(self, path, number_of_players=2, labels=[0, 1], strategies=[]):
         with open(path, "r") as f:
-            n, self.payout_grid = self.load_payout_grid(f)
+            n, self.payout_grid = self.load_grid(f)
             if n != number_of_players:
                 raise Exception(f"The Number of players supplied does not match the file at {path}")
 
@@ -26,23 +25,29 @@ class Nash:
             
             self.strategies=strategies
 
-
-    def load_payout_grid(self, file:__file__):
+    def load_grid(self, file:__file__):
         grid_1D = []
-        grid_2D = []
+        depth_1D, depth_3D = 0, 0
         for line in file:
-            if line.rstrip()=='' :
-                if grid_2D != []:
-                    grid_1D.append(grid_2D)
-                    grid_2D=[]
+            if line.rstrip()=='':
+                depth_1D = 0
+                depth_3D += 1
                 continue
-            grid_3D = []
+
+            # Read the 2d line from the file
+            grid_2D_line = []
             for payouts in line.split(" "):
-                grid_3D.append([int(payout) for payout in payouts.split(",")])
-            grid_2D.append(grid_3D)
-        else : 
-            if grid_2D != []:
-                grid_1D.append(grid_2D)
+                grid_2D_line.append(tuple(int(payout) for payout in payouts.split(",")))
+
+            if depth_3D == 0:
+                grid_1D.append(grid_2D_line)
+            elif depth_3D == 1:
+                for i in range(len(grid_2D_line)):
+                    grid_1D[depth_1D][i] = [grid_1D[depth_1D][i], grid_2D_line[i]]
+            else: 
+                for i in range(len(grid_2D_line)):
+                   grid_1D[depth_1D][i].append( grid_2D_line[i] )
+            depth_1D += 1
         return (2, grid_1D[0]) if len(grid_1D)==1 else (3, grid_1D)
 
     def generate_labels(self, labels_num):

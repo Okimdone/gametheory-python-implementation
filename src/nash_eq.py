@@ -16,16 +16,19 @@ parser.add_argument("-s3","--strategies-p3", nargs='*', dest="strategies3", defa
 
 args = parser.parse_args()
 
-# Checking arguments :
-if not (args.pure or args.mixed) :
+
+# Checking the arguments for specific requirements :
+# no strategy was specified 
+if not (args.pure or args.mixed) :  
     parser.print_help(file=sys.stderr)
     print("\n\nSpecify a strategy to use, available options : [-p, -m]", file=sys.stderr)
     exit(1)
-# Check for the supplied number of players
+# the number of players passed as argument is different than 2 and 3
 elif 2 != args.number_players != 3 :
     parser.print_help(file=sys.stderr)
     print("\n\nSpecify the number of players, available options : [2, 3]", file=sys.stderr)
     exit(2)
+# labels were specified for players which weren't specified
 elif args.number_players != 3 and args.label3 != None :
     parser.print_help(file=sys.stderr)
     print("\n\nA label was specified for a played which doesn't exist", file=sys.stderr)
@@ -35,9 +38,7 @@ elif args.number_players != 3 and args.strategies3 != None :
     print("\n\nStrategy labels were specified for a played which doesn't exist", file=sys.stderr)
     exit(4)
 
-# TODO TODELETE
-print(args)
-
+# Preparing an instance from our game. 'Tableau' 
 nsh = nash.Nash(args.filename, 
                 number_of_players=args.number_players,
                 labels=[args.label1, args.label2, args.label3],
