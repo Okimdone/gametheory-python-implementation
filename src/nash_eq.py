@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser(description='Calculates pure and mixed Nash equ
 parser.add_argument("-f", "--file", dest="filename", help="defines the path to the file containing the utility function", metavar="FILE", required=True)
 parser.add_argument("-p","--pure", dest="pure", action='store_true', help="search for pure nash strategies")
 parser.add_argument("-m","--mixed", dest="mixed", action='store_true', help="search for mixed nash strategies")
-parser.add_argument("-N","--number-of-players",nargs='?',dest="number_players", help="defines the number for playing players, default to 2 if not specified", default=2, metavar="NumberOfPlayers", type=int)
+parser.add_argument("-N","--number-of-players",nargs='?',dest="number_players", help="defines the number for playing players, default to 2 if not specified",  metavar="NumberOfPlayers", type=int)
 parser.add_argument("-l1","--label-p1", dest="label1", default=None, help="define a label for player 1", metavar="LABEL")
 parser.add_argument("-l2","--label-p2", dest="label2", default=None, help="define a label for player 2", metavar="LABEL")
 parser.add_argument("-l3","--label-p3", dest="label3", default=None, help="define a label for player 3", metavar="LABEL")
@@ -24,7 +24,7 @@ if not (args.pure or args.mixed) :
     print("\n\nSpecify a strategy to use, available options : [-p, -m]", file=sys.stderr)
     exit(1)
 # the number of players passed as argument is different than 2 and 3
-elif 2 != args.number_players != 3 :
+elif args.number_players!=None and 2 != args.number_players != 3 :
     parser.print_help(file=sys.stderr)
     print("\n\nSpecify the number of players, available options : [2, 3]", file=sys.stderr)
     exit(2)
