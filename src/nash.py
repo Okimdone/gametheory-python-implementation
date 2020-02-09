@@ -3,27 +3,25 @@ import numpy as np
 class Nash:
     def __init__(self, path, number_of_players=2, labels=[0, 1], strategies=[]):
         with open(path, "r") as f:
-            n, self.payout_grid = self.load_grid(f)
+            n, self.payout_grid     = self.load_grid(f)
             if n != number_of_players:
                 raise Exception(f"The Number of players supplied does not match the file at {path}")
 
-            self.number_of_players=number_of_players
-            self.p_indexes = list(range(number_of_players))
-
-            self.labels = list(range(number_of_players))
+            self.number_of_players  = number_of_players
+            self.p_indexes          = list(range(number_of_players))
+            self.labels             = list(range(number_of_players))
             if labels[0] != None:
-                self.labels[0] = labels[0]
+                self.labels[0]      = labels[0]
             if labels[1] != None:
-                self.labels[1] = labels[1]
+                self.labels[1]      = labels[1]
             if len(labels) == 3 and labels[2]!=None:
-                self.labels[2] = labels[2]
+                self.labels[2]      = labels[2]
 
-            self.strat_labels = [   self.generate_labels(len(self.payout_grid)),
-                                    self.generate_labels(len(self.payout_grid[0])) ]
+            self.strat_labels       = [   self.generate_labels(len(self.payout_grid)),
+                                          self.generate_labels(len(self.payout_grid[0])) ]
             if number_of_players == 3 :
                 self.strat_labels.append( self.generate_labels(len(self.payout_grid[0][0])) )
-            
-            self.strategies=strategies
+            self.strategies         = strategies
 
     def load_grid(self, file:__file__):
         grid_1D = []
