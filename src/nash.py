@@ -6,27 +6,35 @@ from mpl_toolkits.mplot3d import Axes3D
 
 class Nash:
     def __init__(self, path, number_of_players=None, labels=[0, 1], strategies=[]):
-        with open(path, "r") as f:
-            n, self.utility_tableau     = self.load_grid(f)
-            if number_of_players!=None and n != number_of_players:
-                raise Exception(f"The Number of players supplied does not match the file at {path}")
+        if type(path) == list:
+            self.utility_tableau    = path
+            self.number_of_players  = 0
+            d = path
+            while type(d) == list:
+                self.number_of_players += 1
+                d = d[0]
+        else :
+            with open(path, "r") as f:
+                n, self.utility_tableau     = self.load_grid(f)
+                if number_of_players!=None and n != number_of_players:
+                    raise Exception(f"The Number of players supplied does not match the file at {path}")
 
-            self.number_of_players  = n
-            self.p_indexes          = list(range(n))
-            # Defining the players' labels
-            self.labels             = list(range(n))
-            if labels[0] != None:
-                self.labels[0]      = labels[0]
-            if labels[1] != None:
-                self.labels[1]      = labels[1]
-            if len(labels) == 3 and labels[2]!=None:
-                self.labels[2]      = labels[2]
-            # Strategies labels : metadata that might prove useful w plotting 
-            self.strat_labels       = [   self.generate_labels(len(self.utility_tableau)),
-                                          self.generate_labels(len(self.utility_tableau[0])) ]
-            if n == 3 :
-                self.strat_labels.append( self.generate_labels(len(self.utility_tableau[0][0])) )
-            self.strategies         = strategies
+                self.number_of_players  = n
+        self.p_indexes          = list(range(n))
+        # Defining the players' labels
+        self.labels             = list(range(n))
+        if labels[0] != None:
+            self.labels[0]      = labels[0]
+        if labels[1] != None:
+            self.labels[1]      = labels[1]
+        if len(labels) == 3 and labels[2]!=None:
+            self.labels[2]      = labels[2]
+        # Strategies labels : metadata that might prove useful w plotting 
+        self.strat_labels       = [   self.generate_labels(len(self.utility_tableau)),
+                                    self.generate_labels(len(self.utility_tableau[0])) ]
+        if n == 3 :
+            self.strat_labels.append( self.generate_labels(len(self.utility_tableau[0][0])) )
+        self.strategies         = strategies
 
     def load_grid(self, file:__file__):
         grid_1D = []
