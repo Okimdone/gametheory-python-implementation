@@ -1,6 +1,8 @@
 import numpy as np
 from fractions import Fraction
 from gekko import GEKKO
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 class Nash:
     def __init__(self, path, number_of_players=None, labels=[0, 1], strategies=[]):
@@ -127,7 +129,7 @@ class Nash:
     '''
     This section handles finding mixed nash eq
     '''
-    def compute_mixed_strategies(self):
+    def compute_mixed_strategies(self, plot=False):
         equilibriums = self.mixed_strategy_solutions()
 
         print("\nPlayer 1 plays 0 %4.1f%% of the time" % (equilibriums[0]*100))
@@ -139,6 +141,13 @@ class Nash:
         if self.number_of_players == 3 :
             print("Player 3 plays 0 %4.1f%% of the time" % (equilibriums[2]*100))
             print("Player 3 plays 1 %4.1f%% of the time\n" % (100-equilibriums[2]*100))
+        
+        #Check if plotting is requested and plote
+        if plot : 
+            if self.number_of_players == 2 :
+                self.plot2PlayersMixed(*equilibriums)
+            elif self.number_of_players == 3 :
+                self.plot3PlayersMixed(p=equilibriums[0], q=equilibriums[1], r=equilibriums[2])
 
     def mixed_strategy_solutions(self):
         def twoPlayersEUtility( playerId ):
@@ -185,3 +194,104 @@ class Nash:
             return(q,r)
         elif self.number_of_players == 3:
             return threePlayersEUtility()
+
+    
+    '''
+    This section handles plotting
+    '''
+    def plot2PlayersMixed(self, p, q):
+        x1 = np.linspace(0,1,100)
+        x2 = np.linspace(0,1,100)
+
+        y1 = [1 if i>p else 0 for i in x1 ]
+        y2 = [1 if i>q else 0 for i in x2 ]
+
+        plt.plot(y1,x1,label="player 1")
+        plt.plot(x2,y2,label="player 2")
+        plt.legend()
+        plt.show()
+
+    def plot3PlayersMixed(self, p, q, r):
+        ax = plt.axes(projection='3d')
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        x2 = np.linspace(0, 1, 100)
+        y2 = np.linspace(0, 1, 100)
+        X2, Y2 = np.meshgrid(x2, y2)
+        z2 = np.zeros((X2.shape[0], X2.shape[1]))
+        for i in range(X2.shape[0]):
+            for j in range(Y2.shape[1]):
+                z2[i][j] = self.derivateU1(X2[i][j], Y2[i][j])  # z y
+        ax.plot_wireframe(X2, Y2, z2, color="blue")
+        plt.title('First player ')
+        plt.xlabel('Second Player', fontsize=14)
+        plt.ylabel('Third Player', fontsize=14)
+        plt.show()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        x1 = np.linspace(0, 1, 100)
+        y1 = np.linspace(0, 1, 100)
+        X1, Y1 = np.meshgrid(x1, y1)
+        z1 = np.zeros((X1.shape[0], X1.shape[1]))
+        for i in range(X1.shape[0]):
+            for j in range(Y1.shape[1]):
+                z1[i][j] = self.derivateU2(X1[i][j], Y1[i][j])  # z x
+        ax.plot_wireframe(X1, Y1, z1, color="red")
+        plt.title('Second player ')
+        plt.xlabel('Third Player', fontsize=14)
+        plt.ylabel('First Player', fontsize=14)
+        plt.show()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        x = np.linspace(0, 1, 100)
+        y = np.linspace(0, 1, 100)
+        X, Y = np.meshgrid(x, y)
+        z = np.zeros((X.shape[0], X.shape[1]))
+        for i in range(X.shape[0]):
+            for j in range(Y.shape[1]):
+                z[i][j] = self.derivateU3(X[i][j], Y[i][j])  # y x
+        plt.title('Third player ')
+        plt.xlabel('Second Player', fontsize=14)
+        plt.ylabel('First Player', fontsize=14)
+        ax.plot_wireframe(X,Y, z, color="green")
+        plt.show()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot_wireframe(X2, Y2, z2, color="blue")
+        ax.plot_wireframe(X1, z1, Y1, color="red")
+        ax.plot_wireframe(z, X,Y, color="green")
+        plt.title('Third player')
+        plt.xlabel('First Player', fontsize=14)
+        plt.ylabel('Second Player', fontsize=14)
+        plt.show()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        plt.xlabel('Second Player', fontsize=14)
+        plt.ylabel('First Player', fontsize=14)
+        ax.scatter(r,q, p, color="black")
+        plt.show()
+    
+    def derivateU1(self, q, p):
+        c = (   q*p*Fraction(self.utility_tableau[0][0][0][0])+p*(1-q)*self.utility_tableau[0][1][0][0]+(1-p)*q*self.utility_tableau[0][0][1][0]+(1-p)*(1-q)*self.utility_tableau[0][1][1][0]
+                >=
+                q*p*self.utility_tableau[1][0][0][0]+p*(1-q)*self.utility_tableau[1][1][0][0]+(1-p)*q*self.utility_tableau[1][0][1][0]+(1-p)*(1-q)*self.utility_tableau[1][1][1][0])
+        return 1 if c else 0
+
+    def derivateU2(self, p, r):
+        c = (  r*p*self.utility_tableau[0][0][0][1]+(1-r)*p*self.utility_tableau[1][0][0][1]+r*(1-p)*self.utility_tableau[0][0][1][1]+(1-r)*(1-p)*self.utility_tableau[1][0][1][1]
+                >=
+                r*p*self.utility_tableau[0][1][0][1]+(1-r)*p*self.utility_tableau[1][1][0][1]+r*(1-p)*self.utility_tableau[0][1][1][1]+(1-r)*(1-p)*self.utility_tableau[1][1][1][1])
+        return 1 if c else 0
+
+    def derivateU3(self, q, r):
+        c = (   r*q*self.utility_tableau[0][0][0][2]+(1-q)*r*self.utility_tableau[0][1][0][2]+(1-r)*q*self.utility_tableau[1][0][0][2]+(1-r)*(1-q)*self.utility_tableau[1][1][0][2]
+                >=r
+                *q*self.utility_tableau[0][0][1][2]+(1-q)*r*self.utility_tableau[0][1][1][2]+(1-r)*q*self.utility_tableau[1][0][1][2]+(1-r)*(1-q)*self.utility_tableau[1][1][1][2])
+        return 1 if c else 0

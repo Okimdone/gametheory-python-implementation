@@ -6,6 +6,7 @@ parser = argparse.ArgumentParser(description='Calculates pure and mixed Nash equ
 parser.add_argument("-f", "--file", dest="filename", help="defines the path to the file containing the utility function", metavar="FILE", required=True)
 parser.add_argument("-p","--pure", dest="pure", action='store_true', help="search for pure nash strategies")
 parser.add_argument("-m","--mixed", dest="mixed", action='store_true', help="search for mixed nash strategies")
+parser.add_argument("-plt","--plot", dest="plt",default=False, action='store_true', help="Plot the planes of the mixed strategies of each player and their intersections")
 parser.add_argument("-N","--number-of-players",nargs='?',dest="number_players", help="defines the number for playing players, default to 2 if not specified",  metavar="NumberOfPlayers", type=int)
 parser.add_argument("-l1","--label-p1", dest="label1", default=None, help="define a label for player 1", metavar="LABEL")
 parser.add_argument("-l2","--label-p2", dest="label2", default=None, help="define a label for player 2", metavar="LABEL")
@@ -47,4 +48,4 @@ nsh = nash.Nash(args.filename,
 if args.pure:
     nsh.compute_pure_strategies()
 if args.mixed:
-    nsh.compute_mixed_strategies()
+    nsh.compute_mixed_strategies(args.plt)
