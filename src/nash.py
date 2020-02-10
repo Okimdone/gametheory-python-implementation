@@ -1,4 +1,6 @@
 import numpy as np
+from fractions import Fraction
+from gekko import GEKKO
 
 class Nash:
     def __init__(self, path, number_of_players=None, labels=[0, 1], strategies=[]):
@@ -122,143 +124,64 @@ class Nash:
         return best_payout_labels
 
 
-
-
-
-
-
-
-
-
-    #def remove_strictly_dominated_moves(self):
-    #    while self.remove_strictly_dominated_p1() | self.remove_strictly_dominated_p2():
-    #        pass
-
-    #def remove_strictly_dominated_p1(self):
-    #    rows_to_keep = set()
-    #    row_num = len(self.utility_tableau)
-    #    col_num = len(self.utility_tableau[0])
-    #    for c in range(col_num):
-    #        max_payout = max([self.utility_tableau[r][c][P1] for r in range(row_num)])
-    #        for r in range(row_num):
-    #            if self.utility_tableau[r][c][P1] == max_payout:
-    #                rows_to_keep.add(r)
-    #
-    #    new_payout_grid = [self.utility_tableau[i] for i in sorted(rows_to_keep)]
-    #    self.utility_tableau = new_payout_grid
-    #    self.strat_labels[0] = [self.strat_labels[0][i] for i in sorted(rows_to_keep)]
-    #    return row_num != len(rows_to_keep);
-
-    #def remove_strictly_dominated_p2(self):
-    #    cols_to_keep = set()
-    #    row_num = len(self.utility_tableau)
-        #col_num = len(self.utility_tableau[0])
-        #for r in range(row_num):
-            #max_payout = max([self.utility_tableau[r][c][P2] for c in range(col_num)])
-            #for c in range(col_num):
-                #if self.utility_tableau[r][c][P2] == max_payout:
-                    #cols_to_keep.add(c)
-
-        #new_payout_grid = [[] for _ in range(row_num)]
-        #for c in sorted(cols_to_keep):
-            #for r in range(row_num):
-                #new_payout_grid[r].append(self.utility_tableau[r][c])
-        #self.utility_tableau = new_payout_grid
-        #self.strat_labels[1] = [self.strat_labels[1][i] for i in sorted(cols_to_keep)]
-        #return col_num != len(cols_to_keep);
-
-    def remove_dominated_moves(self):
-        while self.remove_dominated_p1() | self.remove_dominated_p2():
-            pass
-
-    def remove_dominated_p1(self):
-        row_num = len(self.utility_tableau)
-        col_num = len(self.utility_tableau[0])
-        max_values = []
-        for c in range(col_num):
-            max_payout = max([self.utility_tableau[r][c][self.p_indexes[0]] for r in range(row_num)])
-            rows_to_keep = set()
-            for r in range(row_num):
-                if self.utility_tableau[r][c][self.p_indexes[0]] == max_payout:
-                    rows_to_keep.add(r)
-            max_values.append(rows_to_keep)
-
-        rows_to_keep = []
-        while max_values:
-            maximum_intersection = max_values[0].copy()
-            for c in range(1, len(max_values)):
-                if len(maximum_intersection & max_values[c]) != 0:
-                    maximum_intersection = maximum_intersection & max_values[c]
-            max_index = maximum_intersection.pop()
-            rows_to_keep.append(max_index)
-            max_values = [row for row in max_values if max_index not in row]
-
-        new_payout_grid = [self.utility_tableau[i] for i in sorted(rows_to_keep)]
-        self.utility_tableau = new_payout_grid
-        self.strat_labels[0] = [self.strat_labels[0][i] for i in sorted(rows_to_keep)]
-        return row_num != len(rows_to_keep)
-
-    def remove_dominated_p2(self):
-        row_num = len(self.utility_tableau)
-        col_num = len(self.utility_tableau[0])
-        max_values = []
-        for r in range(row_num):
-            max_payout = max([self.utility_tableau[r][c][self.p_indexes[1]] for c in range(col_num)])
-            cols_to_keep = set()
-            for c in range(col_num):
-                if self.utility_tableau[r][c][self.p_indexes[1]] == max_payout:
-                    cols_to_keep.add(c)
-            max_values.append(cols_to_keep)
-
-        cols_to_keep = []
-        while max_values:
-            maximum_intersection = max_values[0].copy()
-            for c in range(1, len(max_values)):
-                if len(maximum_intersection & max_values[c]) != 0:
-                    maximum_intersection = maximum_intersection & max_values[c]
-            max_index = maximum_intersection.pop()
-            cols_to_keep.append(max_index)
-            max_values = [col for col in max_values if max_index not in col]
-
-        new_payout_grid = [[] for _ in range(row_num)]
-        for c in sorted(cols_to_keep):
-            for r in range(row_num):
-                new_payout_grid[r].append(self.utility_tableau[r][c])
-        self.utility_tableau = new_payout_grid
-        self.strat_labels[1] = [self.strat_labels[1][i] for i in sorted(cols_to_keep)]
-        return col_num != len(cols_to_keep)
-    def mixed_strategy_solutions(self):
-        self.remove_dominated_moves()
-        p1_move_percents = {}
-        p2_move_percents = {}
-        side_length = len(self.utility_tableau)
-        if side_length == 1:
-            p1_move_percents[self.strat_labels[0][0]] = 100
-            p2_move_percents[self.strat_labels[1][0]] = 100
-            return (p1_move_percents, p2_move_percents)
-
-        p1_outcomes = [[1] * side_length]
-        for c in range(1, side_length):
-            p1_outcomes.append([self.utility_tableau[r][c][self.p_indexes[1]] - self.utility_tableau[r][0][self.p_indexes[1]] for r in range(side_length)])
-        p1_solutions = [1] + [0]
-        p1_outcomes = np.linalg.solve(np.array(p1_outcomes), np.array(p1_solutions))
-        for r in range(len(self.strat_labels[0])):
-            p1_move_percents[self.strat_labels[0][r]] = p1_outcomes[r] * 100
-
-        p2_outcomes = [[1] * side_length]
-        for r in range(1, side_length):
-            p2_outcomes.append([self.utility_tableau[r][c][self.p_indexes[0]] - self.utility_tableau[0][c][self.p_indexes[0]] for c in range(side_length)])
-        p2_solutions = [1] + [0]
-        p2_outcomes = np.linalg.solve(np.array(p2_outcomes), np.array(p2_solutions))
-        for c in range(len(self.strat_labels[1])):
-            p2_move_percents[self.strat_labels[1][c]] = p2_outcomes[c] * 100
-
-        return (p1_move_percents, p2_move_percents)
-
-
+    '''
+    This section handles finding mixed nash eq
+    '''
     def compute_mixed_strategies(self):
         equilibriums = self.mixed_strategy_solutions()
-        for r in self.strat_labels[0]:
-            print("Player 1 plays", r, equilibriums[0][r], "percent of the time")
-        for c in self.strat_labels[1]:
-            print("Player 2 plays", c, equilibriums[0][c], "percent of the time")
+
+        print("\nPlayer 1 plays 0 %4.1f%% of the time" % (equilibriums[0]*100))
+        print("Player 1 plays 1 %4.1f%% of the time\n" % (100-equilibriums[0]*100))
+
+        print("Player 2 plays 0 %4.1f%% of the time" % (equilibriums[1]*100))
+        print("Player 2 plays 1 %4.1f%% of the time\n" % (100-equilibriums[1]*100))
+
+        if self.number_of_players == 3 :
+            print("Player 3 plays 0 %4.1f%% of the time" % (equilibriums[2]*100))
+            print("Player 3 plays 1 %4.1f%% of the time\n" % (100-equilibriums[2]*100))
+
+    def mixed_strategy_solutions(self):
+        def twoPlayersEUtility( playerId ):
+            a = b = None
+            if playerId == 0:
+                a = ( self.utility_tableau[0][0][0]
+                    - self.utility_tableau[0][1][0]
+                    - self.utility_tableau[1][0][0]
+                    + self.utility_tableau[1][1][0])
+                
+                b = ( self.utility_tableau[1][1][0]
+                    - self.utility_tableau[0][1][0])
+            elif playerId == 1:
+                a = ( self.utility_tableau[0][0][1]
+                    - self.utility_tableau[1][0][1]
+                    - self.utility_tableau[0][1][1]
+                    + self.utility_tableau[1][1][1]
+                    )
+                b = ( self.utility_tableau[1][1][1]
+                    - self.utility_tableau[1][0][1]
+                    )
+
+            if a!=None!=b :
+                x = Fraction(b, a)
+                return x
+            else:
+                return None
+
+        def threePlayersEUtility():
+            eq = GEKKO(remote=False)
+            p, q, r = eq.Var(), eq.Var(), eq.Var()
+            ## U1(A) == U1(B)
+            eq.Equation(q*p*Fraction(self.utility_tableau[0][0][0][0])+p*(1-q)*self.utility_tableau[0][1][0][0]+(1-p)*q*self.utility_tableau[0][0][1][0]+(1-p)*(1-q)*self.utility_tableau[0][1][1][0]==q*p*self.utility_tableau[1][0][0][0]+p*(1-q)*self.utility_tableau[1][1][0][0]+(1-p)*q*self.utility_tableau[1][0][1][0]+(1-p)*(1-q)*self.utility_tableau[1][1][1][0])
+            ## U2(A) == U2(B)
+            eq.Equation(r*p*self.utility_tableau[0][0][0][1]+(1-r)*p*self.utility_tableau[1][0][0][1]+r*(1-p)*self.utility_tableau[0][0][1][1]+(1-r)*(1-p)*self.utility_tableau[1][0][1][1]==r*p*self.utility_tableau[0][1][0][1]+(1-r)*p*self.utility_tableau[1][1][0][1]+r*(1-p)*self.utility_tableau[0][1][1][1]+(1-r)*(1-p)*self.utility_tableau[1][1][1][1])
+            ## U3(A) == U3(B)
+            eq.Equation(r*q*self.utility_tableau[0][0][0][2]+(1-q)*r*self.utility_tableau[0][1][0][2]+(1-r)*q*self.utility_tableau[1][0][0][2]+(1-r)*(1-q)*self.utility_tableau[1][1][0][2]==r*q*self.utility_tableau[0][0][1][2]+(1-q)*r*self.utility_tableau[0][1][1][2]+(1-r)*q*self.utility_tableau[1][0][1][2]+(1-r)*(1-q)*self.utility_tableau[1][1][1][2])
+            eq.solve(disp=False)
+            return q.value[0],r.value[0],p.value[0]
+
+        if self.number_of_players == 2:
+            q=twoPlayersEUtility(0)
+            r=twoPlayersEUtility(1)
+            return(q,r)
+        elif self.number_of_players == 3:
+            return threePlayersEUtility()
