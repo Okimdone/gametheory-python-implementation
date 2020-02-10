@@ -2,12 +2,27 @@
 
 This program can compute pure and mixed strategy Nash equilibria for 2 and 3 players. In pure strategy, each player plays only one move.
 
+## Installation : 
+
+```bash
+$ virtualenv nashENV
+$ source nashENV/bin/activate
+$ pip install -r requirements.txt
+```
+
+
+
 To run the program, provide an input file as the first argument and a choice of strategy as the second argument. E.g. :
+```bash
+$ python nash_eq.py file.txt -p
 ```
-    python nash_eq.py file.txt -p
-```
+
+
+
+
+
 ## Usage
-```
+```bash
 usage: nash_eq.py [-h] -f FILE [-p] [-m] [-N [NumberOfPlayers]] [-l1 LABEL]
                   [-l2 LABEL] [-l3 LABEL] [-s1 [LABEL [LABEL ...]]]
                   [-s2 [LABEL [LABEL ...]]] [-s3 [LABEL [LABEL ...]]]
@@ -35,7 +50,7 @@ optional arguments:
                         define strategies' labels for player 2
   -s3 [LABEL [LABEL ...]], --strategies-p3 [LABEL [LABEL ...]]
                         define strategies' labels for player 3
-```        
+```
 
 ## Input file format
 Input files have the following format:
