@@ -8,7 +8,7 @@ import tkinter.ttk
 from tkinter import messagebox
 import os, sys
 from nash import Nash
-
+import matplotlib.image as mpimg
 class Application(tk.Frame):
     def __init__(self, master=None):
         ## initialize
@@ -178,10 +178,88 @@ class Application(tk.Frame):
                 temp.append(" ")
             temp.pop()
 
-            nsh=Nash()
-            nsh.modified_init(temp)
-            # nsh.load_payout_grid(self.tempo)
-            nsh.compute_mixed_strategies()
+            self.nash=Nash(temp)
+            self.clean()
+            self.ThPlayersResultsPanel = tk.PanedWindow(self, orient=tk.VERTICAL, bg='#ffffff')
+            self.ThPlayersResultsPanel.pack(side=tk.LEFT, expand=1)
+            lb = tk.Label(self.ThPlayersResultsPanel, text="Two Players Game", font=("Helvetica", 36), fg='#421190',
+                          bg='#ffffff')
+            lb1 = tk.Label(self.ThPlayersResultsPanel, text="Pure strategies Nash Equilibriums", font=("Helvetica", 22),
+                           fg='#74da45', bg='#ffffff')
+            lb.grid(row=0, columnspan=2, pady=(10, 10))
+            lb1.grid(row=1, columnspan=2, pady=(10, 10))
+            equilibriums = self.nash.pure_strategy_solutions()
+            k = 0
+            if len(equilibriums) == 0:
+                tk.Label(self.ThPlayersResultsPanel,
+                         text="No pure strategy nash equilibriums", font=("Helvetica", 16), fg='#9d9caa',
+                         bg='#ffffff').grid(row=2 + i, pady=(10, 10))
+                k += 1
+            print(self.thp_strategies_labels)
+            x = "Pure Nash equilibrium strategy {} is ({}, {}, {}) with the utilities {}"
+            print(temp)
+            for i, s in enumerate(equilibriums):
+                tk.Label(self.ThPlayersResultsPanel,text=x.format(i + 1, self.thp_strategies_labels[0][s[0]],
+                                                                         self.thp_strategies_labels[1][s[1]],
+                                                                         self.thp_strategies_labels[2][s[2]],
+                                                                         self.nash.utility_tableau[s[0]][s[1]][s[2]]),
+                                                                          font=("Helvetica", 16), fg='#9d9caa',bg='#ffffff').grid(row=2 + i, pady=(10, 10))
+                k += 1
+            tk.Label(self.ThPlayersResultsPanel, text="Mixed strategies Nash Equilibriums", font=("Helvetica", 22),fg='#74da45', bg='#ffffff').grid(row=k + 4, pady=(10, 10))
+            self.equilibriums = self.nash.mixed_strategy_solutions()
+            if self.equilibriums != None:
+                o=0
+                for i in range(1,4):
+                    tk.Label(
+                                self.ThPlayersResultsPanel
+                                , text="Player %d plays %s %4.1f%% of the time" % (i,self.thp_strategies_labels[i-1][0],self.equilibriums[i-1] * 100)
+                                , font=("Helvetica", 16)
+                                , fg='#9d9caa', bg='#ffffff'
+                            ).grid(row=k + 5 + o, pady=(10, 10))
+                    
+                    o+=1
+                    tk.Label(
+                                self.ThPlayersResultsPanel
+                                , text="Player %d plays %s %4.1f%% of the time" % (i,self.thp_strategies_labels[i-1][1],100 - self.equilibriums[1] * 100)
+                                , font=("Helvetica", 16)
+                                , fg='#9d9caa', bg='#ffffff'
+                            ).grid(row=k + 5 + o, pady=(10, 10))
+                    o+=1    
+                    # tk.Label(self.ThPlayersResultsPanel,text="Player 1 plays 0 %4.1f%% of the time" % (self.equilibriums[0] * 100), font=("Helvetica", 16),fg='#9d9caa', bg='#ffffff').grid(row=k + 5, pady=(10, 10))
+                    # tk.Label(self.ThPlayersResultsPanel,text="Player 1 plays 1 %4.1f%% of the time\n" % (100 - self.equilibriums[0] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 6, pady=(10, 10))
+                    # tk.Label(self.ThPlayersResultsPanel,text="Player 2 plays 0 %4.1f%% of the time" % (self.equilibriums[1] * 100), font=("Helvetica", 16),fg='#9d9caa', bg='#ffffff').grid(row=k + 7, pady=(10, 10))
+                    # tk.Label(self.ThPlayersResultsPanel,text="Player 2 plays 1 %4.1f%% of the time\n" % (100 - self.equilibriums[1] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 8, pady=(10, 10))
+                    # tk.Label(self.ThPlayersResultsPanel,text="Player 3 plays 0 %4.1f%% of the time\n" % (self.equilibriums[2] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 9, pady=(10, 10))
+                    # tk.Label(self.ThPlayersResultsPanel,text="Player 3 plays 1 %4.1f%% of the time\n" % (100 - self.equilibriums[2] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 10, pady=(10, 10))
+            else:
+                tk.Label(self.ThPlayersResultsPanel,text="No other Nash equilibrium than the ones found in the pure strategy", font=("Helvetica", 16),fg='#9d9caa', bg='#ffffff').grid(row=k + 5, pady=(10, 10))
+
+            self.logoHolder.destroy()
+            # self.nash.plot3PlayersMixed_GUI(*equilibriums)
+            self.thp_plotHolder = tk.PanedWindow(self, orient=tk.VERTICAL, bg='#ffffff')
+            self.thp_plotHolder.pack(side=tk.RIGHT, expand=1)
+            self.thp_plotHolder.add(tk.Button(self.thp_plotHolder, text="First Player Plot", font=("Helvetica", 16), fg='#ffffff', bg='tomato',command=self.command_fp))
+            self.thp_plotHolder.add(tk.Button(self.thp_plotHolder, text="Second Player Plot", font=("Helvetica", 16), fg='#ffffff', bg='tomato',command=self.command_sp))
+            self.thp_plotHolder.add(tk.Button(self.thp_plotHolder, text="Third Player Plot", font=("Helvetica", 16), fg='#ffffff', bg='tomato',command=self.command_tp))
+            self.thp_plotHolder.add(tk.Button(self.thp_plotHolder, text="Overall Plot", font=("Helvetica", 16), fg='#ffffff', bg='tomato',command=self.command_ap))
+            self.thp_plotHolder.add(tk.Button(self.thp_plotHolder, text="Mixed Nash equilibrium plot", font=("Helvetica", 16), fg='#ffffff', bg='tomato',command=self.command_nash))
+            back = tk.Button(self.ThPlayersResultsPanel, text="Back", font=("Helvetica", 16), fg='#ffffff', bg='tomato',command=self.homepage)
+
+    def command_fp(self):
+        self.nash.plot3PlayersMixed_GUI(*self.equilibriums,0)
+
+    def command_sp(self):
+        self.nash.plot3PlayersMixed_GUI(*self.equilibriums,1)
+
+    def command_tp(self):
+        self.nash.plot3PlayersMixed_GUI(*self.equilibriums,2)
+
+    def command_ap(self):
+        self.nash.plot3PlayersMixed_GUI(*self.equilibriums,3)
+
+    def command_nash(self):
+        self.nash.plot3PlayersMixed_GUI(*self.equilibriums,4)
+
 
     def twoplayers(self):
         self.clean()

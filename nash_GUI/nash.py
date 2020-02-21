@@ -197,6 +197,8 @@ class Nash:
 
             if a!=None!=b :
                 # x = Fraction(b, a)
+                if a==0:
+                    return None
                 return b/a
             else:
                 return None
@@ -220,25 +222,35 @@ class Nash:
         elif self.number_of_players == 3:
             return threePlayersEUtility()
 
-    
+    def U2P(self,q):
+        if q * (self.utility_tableau[0][0][0] - self.utility_tableau[0][1][0] - self.utility_tableau[1][0][0] + self.utility_tableau[1][1][0]) + self.utility_tableau[0][1][0] - self.utility_tableau[1][1][0] > 0:
+            return 1
+        else:
+            return 0
+    def U1P(self,r):
+        if r * (self.utility_tableau[0][0][1] - self.utility_tableau[1][0][1] - self.utility_tableau[0][1][1] + self.utility_tableau[1][1][1]) + self.utility_tableau[1][0][1] - self.utility_tableau[1][1][1] > 0:
+            return 1
+        else:
+            return 0
+            
     '''
     This section handles plotting
     '''
     def plot2PlayersMixed(self, p, q):
-        x1 = np.linspace(0,1,100)
-        x2 = np.linspace(0,1,100)
-
-        y1 = [1 if i>p else 0 for i in x1 ]
-        y2 = [1 if i>q else 0 for i in x2 ]
-
-        plt.plot(y1,x1,label="player 1")
-        plt.plot(x2,y2,label="player 2")
+        x = np.linspace(0,1,100)
+        y=[]
+        y1=[]
+        for i in x: 
+            y.append(self.U1P(i))
+            y1.append(self.U2P(i))
+        plt.savefig("./twp_plot.png")
+        plt.plot(x,y,label="player 1")
+        plt.plot(y1,x,label="player 2")
         plt.legend()
         plt.savefig("./twp_plot.png")
-        plt.show()
+        # plt.show()
 
     def plot3PlayersMixed(self, p, q, r):
-        ax = plt.axes(projection='3d')
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
@@ -303,7 +315,78 @@ class Nash:
         plt.ylabel('First Player', fontsize=14)
         ax.scatter(r,q, p, color="black")
         plt.show()
-    
+
+    def plot3PlayersMixed_GUI(self, p, q, r, k):
+
+        x2 = np.linspace(0, 1, 100)
+        y2 = np.linspace(0, 1, 100)
+        X2, Y2 = np.meshgrid(x2, y2)
+        z2 = np.zeros((X2.shape[0], X2.shape[1]))
+
+        x1 = np.linspace(0, 1, 100)
+        y1 = np.linspace(0, 1, 100)
+        X1, Y1 = np.meshgrid(x1, y1)
+        z1 = np.zeros((X1.shape[0], X1.shape[1]))
+
+        x = np.linspace(0, 1, 100)
+        y = np.linspace(0, 1, 100)
+        X, Y = np.meshgrid(x, y)
+        z = np.zeros((X.shape[0], X.shape[1]))
+
+        for i in range(X2.shape[0]):
+                for j in range(Y2.shape[1]):
+                    z2[i][j] = self.derivateU1(X2[i][j], Y2[i][j])  # z y
+
+        for i in range(X1.shape[0]):
+                for j in range(Y1.shape[1]):
+                    z1[i][j] = self.derivateU2(X1[i][j], Y1[i][j])  # z x
+        
+        for i in range(X.shape[0]):
+                for j in range(Y.shape[1]):
+                    z[i][j] = self.derivateU3(X[i][j], Y[i][j])  # y x
+
+        if k==0:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.plot_wireframe(X2, Y2, z2, color="blue")
+            plt.title('First player ')
+            plt.xlabel('Second Player', fontsize=14)
+            plt.ylabel('Third Player', fontsize=14)
+            plt.show()
+        if k == 1:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.plot_wireframe(X1, Y1, z1, color="red")
+            plt.title('Second player ')
+            plt.xlabel('Third Player', fontsize=14)
+            plt.ylabel('First Player', fontsize=14)
+            plt.show()
+        if k == 2:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            plt.title('Third player ')
+            plt.xlabel('Second Player', fontsize=14)
+            plt.ylabel('First Player', fontsize=14)
+            ax.plot_wireframe(X,Y, z, color="green")
+            plt.show()
+        if k == 3:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.plot_wireframe(z2, X2, Y2, color="blue")
+            ax.plot_wireframe(X1, z1, Y1, color="red")
+            ax.plot_wireframe(Y, X,z, color="green")
+            plt.title('Third player')
+            plt.xlabel('First Player', fontsize=14)
+            plt.ylabel('Second Player', fontsize=14)
+            plt.show()
+        if k == 4:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            plt.xlabel('Second Player', fontsize=14)
+            plt.ylabel('First Player', fontsize=14)
+            ax.scatter(r,q, p, color="black")
+            plt.show()
+
     def derivateU1(self, q, p):
         c = (   q*p*Fraction(self.utility_tableau[0][0][0][0])+p*(1-q)*self.utility_tableau[0][1][0][0]+(1-p)*q*self.utility_tableau[0][0][1][0]+(1-p)*(1-q)*self.utility_tableau[0][1][1][0]
                 >=
