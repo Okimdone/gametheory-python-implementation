@@ -1,14 +1,20 @@
-#!nasheq/bin/python3
+#!ENV/bin/python
 
 import numpy as np
 import matplotlib.pyplot as plt
 import traceback
-import tkinter as tk
-import tkinter.ttk
-from tkinter import messagebox
-import os, sys
+try:
+    import tkinter as tk
+    import tkinter.ttk
+    from tkinter import messagebox
+except:
+    import Tkinter as tk
+    import Tkinter.ttk
+    from Tkinter import messagebox
+import os, sys 
 from nash import Nash
 import matplotlib.image as mpimg
+
 class Application(tk.Frame):
     def __init__(self, master=None):
         ## initialize
@@ -220,7 +226,7 @@ class Application(tk.Frame):
                     o+=1
                     tk.Label(
                                 self.ThPlayersResultsPanel
-                                , text="Player %d plays %s %4.1f%% of the time" % (i,self.thp_strategies_labels[i-1][1],100 - self.equilibriums[1] * 100)
+                                , text="Player %d plays %s %4.1f%% of the time" % (i,self.thp_strategies_labels[i-1][1],100 - self.equilibriums[i-1] * 100)
                                 , font=("Helvetica", 16)
                                 , fg='#9d9caa', bg='#ffffff'
                             ).grid(row=k + 5 + o, pady=(10, 10))
@@ -450,7 +456,7 @@ class Application(tk.Frame):
             self.twp_plot = tk.PhotoImage(file="./twp_plot.png")
             self.w12 = tk.Label(self.twp_plotHolder, image=self.twp_plot, bg='#ffffff')
             self.w12.grid(padx=(10, 10), pady=(10, 10))
-            self.twp_plotHolder.add(self.w2)
+            self.twp_plotHolder.add(self.w12)
             back = tk.Button(self.TwoPlayersResultsPanel, text="Back", font=("Helvetica", 16), fg='#ffffff', bg='tomato',command=self.homepage)
     def homepage(self):
         python = sys.executable

@@ -210,8 +210,15 @@ class Nash:
             eq.Equation(q*p*Fraction(self.utility_tableau[0][0][0][0])+p*(1-q)*self.utility_tableau[0][1][0][0]+(1-p)*q*self.utility_tableau[0][0][1][0]+(1-p)*(1-q)*self.utility_tableau[0][1][1][0]==q*p*self.utility_tableau[1][0][0][0]+p*(1-q)*self.utility_tableau[1][1][0][0]+(1-p)*q*self.utility_tableau[1][0][1][0]+(1-p)*(1-q)*self.utility_tableau[1][1][1][0])
             ## U2(A) == U2(B)
             eq.Equation(r*p*self.utility_tableau[0][0][0][1]+(1-r)*p*self.utility_tableau[1][0][0][1]+r*(1-p)*self.utility_tableau[0][0][1][1]+(1-r)*(1-p)*self.utility_tableau[1][0][1][1]==r*p*self.utility_tableau[0][1][0][1]+(1-r)*p*self.utility_tableau[1][1][0][1]+r*(1-p)*self.utility_tableau[0][1][1][1]+(1-r)*(1-p)*self.utility_tableau[1][1][1][1])
+
             ## U3(A) == U3(B)
             eq.Equation(r*q*self.utility_tableau[0][0][0][2]+(1-q)*r*self.utility_tableau[0][1][0][2]+(1-r)*q*self.utility_tableau[1][0][0][2]+(1-r)*(1-q)*self.utility_tableau[1][1][0][2]==r*q*self.utility_tableau[0][0][1][2]+(1-q)*r*self.utility_tableau[0][1][1][2]+(1-r)*q*self.utility_tableau[1][0][1][2]+(1-r)*(1-q)*self.utility_tableau[1][1][1][2])
+            eq.Equation(0<=r)
+            eq.Equation(r<=1)
+            eq.Equation(0<=q)
+            eq.Equation(q<=1)
+            eq.Equation(0<=p)
+            eq.Equation(p<=1)
             eq.solve(disp=False)
             return q.value[0],r.value[0],p.value[0]
 
