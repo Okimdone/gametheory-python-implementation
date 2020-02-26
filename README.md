@@ -3,23 +3,67 @@
 This program can compute pure and mixed strategy Nash equilibria for 2 and 3 players. In pure strategy, each player plays only one move.
 
 To run the program, provide an input file as the first argument and a choice of strategy as the second argument. E.g. :
+
+
+
+### For the graphical interface:
+
 ```
-    python nach_GUI/nash_eq.py file.txt -p
+    python nach_GUI/app.py file.txt -p
 ```
+
 ## Installation
 
 To install the dependencies and set up the application, follow the following instructions :
 
-### Linux
+### Requirements:
+
+You must have installed python 3.x:
+
+#### On Linux
 
 ```bash
-python3 -m pip install virtualenv
-virtualenv ENV
-source ENV/bin/activate
-pip install -r requirements.txt
+sudo apt-get update
+sudo apt-get install python3
 ```
 
+#### On Windows 
 
+You can download it and install it from https://www.python.org/downloads/windows/
+
+## Execution
+
+### For the terminal interface:
+
+#### Linux 
+
+```
+python nach_GUI/nash_eq.py file.txt -p
+```
+
+#### Windows
+
+```
+py nach_GUI/nash_eq.py file.txt -p
+```
+
+### For the graphical interface:
+
+#### Linux
+
+execute the following instruction on your terminal:
+
+```
+./launch.sh
+```
+
+#### Windows
+
+execute the following instruction on your terminal:
+
+```
+./launch.bat
+```
 
 ## Usage
 

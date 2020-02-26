@@ -201,9 +201,7 @@ class Application(tk.Frame):
                          text="No pure strategy nash equilibriums", font=("Helvetica", 16), fg='#9d9caa',
                          bg='#ffffff').grid(row=2 + i, pady=(10, 10))
                 k += 1
-            print(self.thp_strategies_labels)
             x = "Pure Nash equilibrium strategy {} is ({}, {}, {}) with the utilities {}"
-            print(temp)
             for i, s in enumerate(equilibriums):
                 tk.Label(self.ThPlayersResultsPanel,text=x.format(i + 1, self.thp_strategies_labels[0][s[0]],
                                                                          self.thp_strategies_labels[1][s[1]],
@@ -213,7 +211,7 @@ class Application(tk.Frame):
                 k += 1
             tk.Label(self.ThPlayersResultsPanel, text="Mixed strategies Nash Equilibriums", font=("Helvetica", 22),fg='#74da45', bg='#ffffff').grid(row=k + 4, pady=(10, 10))
             self.equilibriums = self.nash.mixed_strategy_solutions()
-            if self.equilibriums != None:
+            if equilibriums[0]!=None or equilibriums[1]!=None or equilibriums[2]!=None: 
                 o=0
                 for i in range(1,4):
                     tk.Label(
@@ -231,12 +229,6 @@ class Application(tk.Frame):
                                 , fg='#9d9caa', bg='#ffffff'
                             ).grid(row=k + 5 + o, pady=(10, 10))
                     o+=1    
-                    # tk.Label(self.ThPlayersResultsPanel,text="Player 1 plays 0 %4.1f%% of the time" % (self.equilibriums[0] * 100), font=("Helvetica", 16),fg='#9d9caa', bg='#ffffff').grid(row=k + 5, pady=(10, 10))
-                    # tk.Label(self.ThPlayersResultsPanel,text="Player 1 plays 1 %4.1f%% of the time\n" % (100 - self.equilibriums[0] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 6, pady=(10, 10))
-                    # tk.Label(self.ThPlayersResultsPanel,text="Player 2 plays 0 %4.1f%% of the time" % (self.equilibriums[1] * 100), font=("Helvetica", 16),fg='#9d9caa', bg='#ffffff').grid(row=k + 7, pady=(10, 10))
-                    # tk.Label(self.ThPlayersResultsPanel,text="Player 2 plays 1 %4.1f%% of the time\n" % (100 - self.equilibriums[1] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 8, pady=(10, 10))
-                    # tk.Label(self.ThPlayersResultsPanel,text="Player 3 plays 0 %4.1f%% of the time\n" % (self.equilibriums[2] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 9, pady=(10, 10))
-                    # tk.Label(self.ThPlayersResultsPanel,text="Player 3 plays 1 %4.1f%% of the time\n" % (100 - self.equilibriums[2] * 100),font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 10, pady=(10, 10))
             else:
                 tk.Label(self.ThPlayersResultsPanel,text="No other Nash equilibrium than the ones found in the pure strategy", font=("Helvetica", 16),fg='#9d9caa', bg='#ffffff').grid(row=k + 5, pady=(10, 10))
 
@@ -437,18 +429,24 @@ class Application(tk.Frame):
                 tk.Label(self.TwoPlayersResultsPanel, text="Mixed strategies Nash Equilibriums", font=("Helvetica", 26),
                          fg='#74da45', bg='#ffffff').grid(row=k + 4, pady=(10, 10))
                 equilibriums = nsh.mixed_strategy_solutions()
-                tk.Label(self.TwoPlayersResultsPanel,
-                         text="Player 1 plays 0 %4.1f%% of the time" % (equilibriums[0] * 100), font=("Helvetica", 16),
-                         fg='#9d9caa', bg='#ffffff').grid(row=k + 5, pady=(10, 10))
-                tk.Label(self.TwoPlayersResultsPanel,
-                         text="Player 1 plays 1 %4.1f%% of the time\n" % (100 - equilibriums[0] * 100),
-                         font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 6, pady=(10, 10))
-                tk.Label(self.TwoPlayersResultsPanel,
-                         text="Player 2 plays 0 %4.1f%% of the time" % (equilibriums[1] * 100), font=("Helvetica", 16),
-                         fg='#9d9caa', bg='#ffffff').grid(row=k + 7, pady=(10, 10))
-                tk.Label(self.TwoPlayersResultsPanel,
-                         text="Player 2 plays 1 %4.1f%% of the time\n" % (100 - equilibriums[1] * 100),
-                         font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 8, pady=(10, 10))
+                print(equilibriums)
+                if equilibriums[0]!=None or equilibriums[1]!=None:
+                    tk.Label(self.TwoPlayersResultsPanel,
+                            text="Player 1 plays 0 %4.1f%% of the time" % (equilibriums[0] * 100), font=("Helvetica", 16),
+                            fg='#9d9caa', bg='#ffffff').grid(row=k + 5, pady=(10, 10))
+                    tk.Label(self.TwoPlayersResultsPanel,
+                            text="Player 1 plays 1 %4.1f%% of the time\n" % (100 - equilibriums[0] * 100),
+                            font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 6, pady=(10, 10))
+                    tk.Label(self.TwoPlayersResultsPanel,
+                            text="Player 2 plays 0 %4.1f%% of the time" % (equilibriums[1] * 100), font=("Helvetica", 16),
+                            fg='#9d9caa', bg='#ffffff').grid(row=k + 7, pady=(10, 10))
+                    tk.Label(self.TwoPlayersResultsPanel,
+                            text="Player 2 plays 1 %4.1f%% of the time\n" % (100 - equilibriums[1] * 100),
+                            font=("Helvetica", 16), fg='#9d9caa', bg='#ffffff').grid(row=k + 8, pady=(10, 10))
+                else:
+                    tk.Label(self.TwoPlayersResultsPanel,
+                            text="No Complete Mixed Strategy than those found in the pure strategy!!", font=("Helvetica", 16),
+                            fg='#9d9caa', bg='#ffffff').grid(row=k + 5, pady=(10, 10))
             self.logoHolder.destroy()
             nsh.plot2PlayersMixed(*equilibriums)
             self.twp_plotHolder = tk.PanedWindow(self, orient=tk.VERTICAL, bg='#ffffff')
