@@ -211,7 +211,7 @@ class Application(tk.Frame):
                 k += 1
             tk.Label(self.ThPlayersResultsPanel, text="Mixed strategies Nash Equilibriums", font=("Helvetica", 22),fg='#74da45', bg='#ffffff').grid(row=k + 4, pady=(10, 10))
             self.equilibriums = self.nash.mixed_strategy_solutions()
-            if equilibriums[0]!=None or equilibriums[1]!=None or equilibriums[2]!=None: 
+            if self.equilibriums[0]!=None or self.equilibriums[1]!=None or self.equilibriums[2]!=None: 
                 o=0
                 for i in range(1,4):
                     tk.Label(
